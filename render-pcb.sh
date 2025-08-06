@@ -73,13 +73,12 @@ else
     fi
 fi
 
-
-KICAD_CLI=$(which kicad-cli || which kicad-cli-nightly)
+# Use Flatpak to run kicad-cli
+KICAD_CLI="flatpak run --command=kicad-cli org.kicad.KiCad"
 
 echo "$output_path"
 
 mkdir -p "$output_path"
-
 
 if [[ -n "$zoom" ]]; then
     KICAD_CLI_OPTIONAL_ARGS="$KICAD_CLI_OPTIONAL_ARGS --zoom $zoom"

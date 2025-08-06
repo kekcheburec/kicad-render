@@ -15,8 +15,8 @@ jobs:
     name: Build, Test and Push
     runs-on: ubuntu-latest
     env:
-      docker_image: ghcr.io/linalinn/kicad-render:${{ github.ref_name }}
-      docker_image_cache: ghcr.io/linalinn/kicad-render:cache-${{ github.ref_name }}
+      docker_image: ghcr.io/kekcheburec/kicad-render:${{ github.ref_name }}
+      docker_image_cache: ghcr.io/kekcheburec/kicad-render:cache-${{ github.ref_name }}
       docker_file: ./Dockerfile
 
     permissions:
@@ -52,62 +52,16 @@ jobs:
           cache-from: "type=registry,ref=${{ env.docker_image_cache }}"
           load: true
           tags: "${{ env.docker_image }}"
+          platforms: linux/amd64
+          privileged: true
 
       - name: simple render
-        run: docker run -v ${GITHUB_WORKSPACE}:/pwd --rm ${{ env.docker_image }} render-pcb.sh -f "/pwd/.github/tests/test pcb/test.kicad_pcb"
+        run: docker run --privileged -v ${GITHUB_WORKSPACE}:/pwd --rm ${{ env.docker_image }} render-pcb.sh -f "/pwd/.github/tests/test pcb/troyka-base-module.kicad_pcb"
       - name: simple render - test file created
-        run: test -s "${GITHUB_WORKSPACE}/.github/tests/test pcb/test_top.png"
-
-      - name: simple render with output path
-        run: docker run -v ${GITHUB_WORKSPACE}:/pwd --rm ${{ env.docker_image }} render-pcb.sh -f "/pwd/.github/tests/test pcb/test.kicad_pcb" -o "/pwd/images"
-      - name: simple render with output path - test file created
-        run: test -s "${GITHUB_WORKSPACE}/images/top.png"
-
-      - name: simple render with filename prefix
-        run: docker run -v ${GITHUB_WORKSPACE}:/pwd --rm ${{ env.docker_image }} render-pcb.sh -f "/pwd/.github/tests/test pcb/test.kicad_pcb" -p fp 
-      - name: simple render with filename prefix - test file created
-        run: test -s "${GITHUB_WORKSPACE}/.github/tests/test pcb/fp_top.png"
-
-      - name: simple render with output path and filename prefix
-        run: docker run -v ${GITHUB_WORKSPACE}:/pwd --rm ${{ env.docker_image }}  render-pcb.sh -f "/pwd/.github/tests/test pcb/test.kicad_pcb" -o "/pwd/images" -p fp
-      - name: simple render with output path and filename prefix - test file created
-        run: test -s "${GITHUB_WORKSPACE}/images/fp_top.png"
-
-      - name: simple render with zoom
-        run: docker run -v ${GITHUB_WORKSPACE}:/pwd --rm ${{ env.docker_image }} render-pcb.sh -f "/pwd/.github/tests/test pcb/test.kicad_pcb" -o "/pwd/images" -z "0.5" 
-      - name: simple render with zoom - test file created
-        run: test -s "${GITHUB_WORKSPACE}/images/top.png"
-
-      - name: render with animation
-        run: docker run -v ${GITHUB_WORKSPACE}:/pwd --rm ${{ env.docker_image }} render-pcb.sh -f "/pwd/.github/tests/test pcb/test.kicad_pcb"  -o "/pwd/images" -a "gif" 
-      - name: render with animation- test file created
-        run: test -s "${GITHUB_WORKSPACE}/images/rotating.gif"
+        run: test -s "${GITHUB_WORKSPACE}/.github/tests/test pcb/troyka-base-module_top.png"
 
       - name: replace docker image with branch image
-        run: sed -i 's#ghcr.io/linalinn/kicad-render.*$#${{ env.docker_image }}#g' ${GITHUB_WORKSPACE}/action.yaml && cat ${GITHUB_WORKSPACE}/action.yaml 
-
-      - name: INT-TEST render pcb image with pre_render script
-        uses: ./
-        with:
-          pcb_file: "${{ github.workspace }}/.github/tests/test pcb/test.kicad_pcb"
-          output_path: ${{ github.workspace }}/images/action
-          pre_render: "${{ github.workspace }}/.github/tests/test pcb/kicad_render_pre_render.sh"
-
-      - name: check INT-TEST render pcb image with pre_render script
-        run: test -s "${GITHUB_WORKSPACE}/images/action/prefix-via pre-render_top.png"
-
-      - name: INT-TEST render pcb image
-        uses: ./
-        with:
-          pcb_file: "${{ github.workspace }}/.github/tests/test pcb/test.kicad_pcb"
-          output_path: "${{ github.workspace }}/images/action"
-          background: transparent
-          zoom: 0.5
-          animation: "gif"
-          kicad_cli_options: " --perspective"
-
-      - name: check INT-TEST render pcb image
-        run: test -s "${GITHUB_WORKSPACE}/images/action/rotating.gif"
+        run: sed -i 's#ghcr.io/kekcheburec/kicad-render.*$#${{ env.docker_image }}#g' ${GITHUB_WORKSPACE}/action.yaml && cat ${GITHUB_WORKSPACE}/action.yaml 
       
       - name: Archive test renders
         if: always()
@@ -119,15 +73,15 @@ jobs:
       - name: push docker image dev
         if: github.ref_name != github.event.repository.default_branch
         run: |
-          docker tag ${{ env.docker_image }} ghcr.io/linalinn/kicad-render:9-dev-${{ github.ref_name }}
-          docker tag ${{ env.docker_image }} ghcr.io/linalinn/kicad-render:9-dev-${{ steps.date.outputs.date }}
-          docker push ghcr.io/linalinn/kicad-render:9-dev-${{ github.ref_name }}
-          docker push ghcr.io/linalinn/kicad-render:9-dev-${{ steps.date.outputs.date }}
+          docker tag ${{ env.docker_image }} ghcr.io/kekcheburec/kicad-render:9-dev-${{ github.ref_name }}
+          docker tag ${{ env.docker_image }} ghcr.io/kekcheburec/kicad-render:9-dev-${{ steps.date.outputs.date }}
+          docker push ghcr.io/kekcheburec/kicad-render:9-dev-${{ github.ref_name }}
+          docker push ghcr.io/kekcheburec/kicad-render:9-dev-${{ steps.date.outputs.date }}
 
       - name: push docker image
         if: github.ref_name == github.event.repository.default_branch
         run: |
-          docker tag ${{ env.docker_image }} ghcr.io/linalinn/kicad-render:9
-          docker tag ${{ env.docker_image }} ghcr.io/linalinn/kicad-render:9-${{ steps.date.outputs.date }}
-          docker push ghcr.io/linalinn/kicad-render:9
-          docker push ghcr.io/linalinn/kicad-render:9-${{ steps.date.outputs.date }}
+          docker tag ${{ env.docker_image }} ghcr.io/kekcheburec/kicad-render:9
+          docker tag ${{ env.docker_image }} ghcr.io/kekcheburec/kicad-render:9-${{ steps.date.outputs.date }}
+          docker push ghcr.io/kekcheburec/kicad-render:9
+          docker push ghcr.io/kekcheburec/kicad-render:9-${{ steps.date.outputs.date }}

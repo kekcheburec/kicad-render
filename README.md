@@ -1,5 +1,5 @@
 # kicad render action
-[![KiCad render  - for gitlab ](https://img.shields.io/badge/KiCad_render_-for_gitlab_-2ea44f?style=for-the-badge&logo=gitlab)](https://gitlab.com/linalinn/kicad-render)
+[![KiCad render  - for gitlab ](https://img.shields.io/badge/KiCad_render_-for_gitlab_-2ea44f?style=for-the-badge&logo=gitlab)](https://gitlab.com/kekcheburec/kicad-render)
 
 This action allows you to automatically render Images of your PCB and use them e.g. in a README.md
 
@@ -22,7 +22,7 @@ This action allows you to automatically render Images of your PCB and use them e
             uses: actions/checkout@v4
 
           - name: render pcb image
-            uses: linalinn/kicad-render@main
+            uses: kekcheburec/kicad-render@main
             with:
               pcb_file: <path from repo root to .kicad_pcb>
               output_path: ${{ github.workspace }}/images
@@ -64,7 +64,7 @@ This action allows you to automatically render Images of your PCB and use them e
     ### Images
     ![top](<github_username>.github.io/<repo_name>/top.png)
     ![bottom](<github_username>.github.io/<repo_name>/bottom.png)
-    rendered with [kicad-render](https://github.com/linalinn/kicad-render)
+    rendered with [kicad-render](https://github.com/kekcheburec/kicad-render)
     ```
 
 6. Prepare the repo  
@@ -80,7 +80,7 @@ This Action can also render an Animation of you pcb rotating as gif or mp4 is ca
 
 ```yaml
 - name: render pcb image
-  uses: linalinn/kicad-render@main
+  uses: kekcheburec/kicad-render@main
   with:
     pcb_file: <path from repo root to .kicad_pcb>
     output_path: ${{ github.workspace }}/images
@@ -126,4 +126,4 @@ The [code](https://gist.github.com/arturo182/57ab066e6a4a36ee22979063e4d5cce1) f
 
 
 ## Development
-In this repo, you find an `.devcontainer` folder. This is for making Development and testing easier by not having to install kicad-nightly on your system. Dev containers are supported by Visual Studio Code, JetBrains, and Github. Alternatively, you can run the following docker command in the repository root `docker run -v "$(pwd)":/pwd --workdir=/pwd --rm -it ghcr.io/linalinn/kicad:9.0 bash` and run kicad nightly from inside this container.
+In this repo, you find an `.devcontainer` folder. This is for making Development and testing easier by not having to install kicad-nightly on your system. Dev containers are supported by Visual Studio Code, JetBrains, and Github. Alternatively, you can run the following docker command in the repository root `docker run -v "$(pwd)":/pwd --workdir=/pwd --rm -it ghcr.io/kekcheburec/kicad:9.0 bash` and run kicad nightly from inside this container.

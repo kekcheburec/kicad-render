@@ -1,25 +1,28 @@
-FROM ubuntu:24.04 as ubuntu-kicad
-
-ARG DEBIAN_FRONTEND=noninteractive
+FROM fedora:42
 
 ARG VERSION=no-version
-
-ARG KICAD_PPA=kicad/kicad-9.0-releases
-
-ARG KICAD_PACKAGE=kicad
-
 ENV VERSION=$VERSION
 
-RUN apt-get update -y && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:${KICAD_PPA} && \
-    apt-get install $KICAD_PACKAGE ffmpeg -y && \ 
-    rm -rf /var/lib/apt/lists/*
+# Install required packages including Flatpak
+RUN dnf -y update && \
+    dnf -y install \
+    flatpak \
+    ffmpeg \
+    && dnf clean all
 
-FROM ubuntu-kicad
+# Configure Flatpak to work in unprivileged mode
+ENV FLATPAK_SYSTEM_DIR=/var/lib/flatpak
+ENV FLATPAK_SYSTEM_HELPER_ON_SESSION=0
+ENV FLATPAK_ENABLE_SUDO=0
 
+# Add Flathub repository and install KiCad
+RUN flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo && \
+    flatpak --user install -y --noninteractive flathub org.kicad.KiCad
+
+# Copy scripts
 COPY *.sh /usr/bin/
 
+# Make scripts executable
 RUN chmod +rx /usr/bin/render-pcb.sh && chmod +rx /usr/bin/kicad_animation.sh
 
 WORKDIR /pwd

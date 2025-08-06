@@ -29,7 +29,8 @@ inputs:
     required: false
 runs:
   using: 'docker'
-  image: docker://ghcr.io/linalinn/kicad-render:9
+  image: docker://ghcr.io/kekcheburec/kicad-render:9
+  options: --privileged
   args:
     - bash
     - -c 
@@ -46,4 +47,3 @@ runs:
       -o "$INPUT_OUTPUT_PATH" 
       -b "$INPUT_BACKGROUND" 
       -z "$INPUT_ZOOM"; fi
-

@@ -37,7 +37,8 @@ ROTATION=360 # Total rotation angle
 STEP=3 # Rotation step in degrees
 FRAMERATE=30 # Framerate for the final video
 
-KICAD_CLI=$(which kicad-cli || which kicad-cli-nightly)
+# Use Flatpak to run kicad-cli
+KICAD_CLI="flatpak run --command=kicad-cli org.kicad.KiCad"
 
 mkdir -p $OUTPUT_DIR
 mkdir -p $FRAME_DIR
